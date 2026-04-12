@@ -74,7 +74,7 @@ contract HomeTransaction {
         contractState = ContractState.WaitingRealtorReview;
 
         deposit = msg.value;
-        finalizeDeadline = now + timeBetweenDepositAndFinalization;
+        finalizeDeadline = block.timestamp + timeBetweenDepositAndFinalization;
     }
 
     function realtorReviewedClosingConditions(bool accepted) public {
@@ -107,13 +107,13 @@ contract HomeTransaction {
     }
 
     function anyWithdrawFromTransaction() public {
-        require(buyer == msg.sender || finalizeDeadline <= now, "Only buyer can withdraw before transaction deadline");
+        require(buyer == msg.sender || finalizeDeadline <= block.timestamp, "Only buyer can withdraw before transaction deadline");
 
         require(contractState == ContractState.WaitingFinalization, "Wrong contract state");
 
         contractState = ContractState.Rejected;
 
-        seller.transfer(deposit-realtorFee);
+        buyer.transfer(deposit);
         realtor.transfer(realtorFee);
     }
 }
